@@ -12,4 +12,5 @@ export const config = {
     authenticator: "SNOWFLAKE_JWT",
   },
   snowflakePemString: String(process.env.SNOWFLAKE_PK_STRING),
+  snowflakeTable: String(process.env.SNOWFLAKE_ACTUALS_TABLE_NAME)
 };

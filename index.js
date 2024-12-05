@@ -23,6 +23,10 @@ const main = async () => {
   // create the connection
   await createConnection(client);
 
+  console.log('select top 1 * from ...')
+  const result = await snowflakeQuery(client, `select top 1 * from ${config.snowflakeTable};`)
+
+  console.log(result)
 
   // script done
   console.log('Script end!')
@@ -54,8 +58,8 @@ const writePem = async (
 ) => {
   const isFileExisting = await checkFileExist(filePath);
   if (isFileExisting) {
-    console.log("PEM already existing, dont write again");
-    return true;
+    console.log("PEM already existing, removing");
+    await fs.rm(filePath)
   }
 
   console.log(`Writing PEM to ${filePath}`);
@@ -76,5 +80,24 @@ const checkFileExist = async (filePath) => {
     return false;
   }
 };
+
+
+const snowflakeQuery = (client, sqlText) => new Promise((resolve, reject) => {
+  client.execute({
+    sqlText,
+    complete: async (error, stmt, rows) => {
+      if (error) {
+        console.log(error, "Failed to execute statement");
+        reject(error);
+      } else {
+        console.log(
+          `Query successfull, got ${rows?.length
+          } rows from ${stmt.getSqlText()}`
+        );
+        resolve(rows);
+      }
+    },
+  });
+});
 
 main()
